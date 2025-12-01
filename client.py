@@ -6,47 +6,51 @@ import json
 OLLAMA_API_URL = "http://localhost:11434/api/generate" #Ollama's default local server URL
 MODEL_NAME = "llama3:8b"  # change model if needed (not using llama3:70b as it will crash my computer)
 
-def generate_llama3_response(prompt, model="llama3", stream=False):
+def query_llama(system_prompt, user_message, temperature=0.35):
+
+    prompt = f"{system_prompt}\n\nUser: {user_message}\n\nAssistant:"
 
     payload = {
-        "model": model,
-        "prompt": prompt,
-        "stream": stream
+        "model": MODEL_NAME,
+        "prompt": user_message,
+        "stream": True,
+        "options": {
+            "temperature": temperature,
+            "num_predict": 2000
+        }
     }
 
     try:
-        if stream:
-            response = requests.post(OLLAMA_API_URL, json=payload, stream=True)
-            response.raise_for_status() # Raise an exception for bad status codes
+        # Sending request to Ollama API
+        response = requests.post(OLLAMA_API_URL, json=payload, timeout=120, stream=True)
+        response.raise_for_status()
 
-            full_response = ""
-            for line in response.iter_lines():
-                if line:
-                    decoded_line = line.decode('utf-8')
-                    try:
-                        json_data = json.loads(decoded_line)
-                        if "response" in json_data:
-                            full_response += json_data["response"]
-                            print(json_data["response"], end="", flush=True) # Print incrementally
-                    except json.JSONDecodeError:
-                        print(f"Could not decode JSON from line: {decoded_line}")
-            return full_response
-        else:
-            response = requests.post(OLLAMA_API_URL, json=payload)
-            response.raise_for_status()
-            return response.json()["response"]
-
+        # Parse response
+        result = response.json()
+        return result["response"].strip()
+    
+    except requests.exceptions.Timeout:
+        return "ERROR: Request timed out. Llama took too long to respond."
     except requests.exceptions.ConnectionError:
-        return "Error: Could not connect to Ollama server."
-    except requests.exceptions.RequestException as e:
-        return f"Error during API request: {e}"
+        return "ERROR: Cannot connect to Ollama. Is it running? (ollama serve)"
+    
+    except Exception as e:
+        return f"ERROR: {str(e)}"
 
+
+
+
+'''
 if __name__ == "__main__":
-    user_prompt = "Name 5 countries"
-
+    import argparse
+    parser = argparse.ArgumentParser(description="Query Llama 3 via Ollama")
+    parser.add_argument("-p", "--prompt", help="Prompt text", default=None)
+    args = parser.parse_args()
+    
+    user_prompt = args.prompt or input("Enter your prompt: ")
     print(f"Sending prompt to Llama 3: '{user_prompt}'")
-
-    # Stream the response in chunks
-    print("\nStreaming Response")
-    response_streamed = generate_llama3_response(user_prompt, stream=True) 
-    print("\n(Stream complete)")
+    
+    response = query_llama("", user_prompt)
+    print("\nResponse:")
+    print(response)
+    '''
