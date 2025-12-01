@@ -1,47 +1,52 @@
 import requests
 import json
 
-# Configuration for the local Ollama Llama 3 API
-LLAMA3_API_URL="http://localhost:11434"
+# Define the Ollama API endpoint for generating responses
 
-def generate_llama3_response(prompt, model_name="llama3", stream=False):
-        """
-        Sends a prompt to the local Ollama Llama 3 model and returns the response.
+OLLAMA_API_URL = "http://localhost:11434/api/generate" #Ollama's default local server URL
+MODEL_NAME = "llama3:8b"  # change model if needed (not using llama3:70b as it will crash my computer)
 
-        Args:
-            prompt (str): The text prompt to send to the model.
-            model_name (str): llmama3:8b
-            stream (bool): If True, the response will be streamed in chunks.
-                           If False, the full response will be returned at once.
+def generate_llama3_response(prompt, model="llama3", stream=False):
 
-        Returns:
-            str: The generated response from Llama 3.
-        """
+    payload = {
+        "model": model,
+        "prompt": prompt,
+        "stream": stream
+    }
 
-        payload = {
-            "model": model_name,
-            "prompt": prompt,
-            "stream": stream
-        }
+    try:
+        if stream:
+            response = requests.post(OLLAMA_API_URL, json=payload, stream=True)
+            response.raise_for_status() # Raise an exception for bad status codes
 
-        try:
-            response = requests.post(f"{LLAMA3_API_URL}/generate", json=payload, stream=stream)
+            full_response = ""
+            for line in response.iter_lines():
+                if line:
+                    decoded_line = line.decode('utf-8')
+                    try:
+                        json_data = json.loads(decoded_line)
+                        if "response" in json_data:
+                            full_response += json_data["response"]
+                            print(json_data["response"], end="", flush=True) # Print incrementally
+                    except json.JSONDecodeError:
+                        print(f"Could not decode JSON from line: {decoded_line}")
+            return full_response
+        else:
+            response = requests.post(OLLAMA_API_URL, json=payload)
             response.raise_for_status()
+            return response.json()["response"]
 
-            if stream:
-                full_response = ""
-                for chunk in response.iter_lines():
-                    if chunk:
-                        decoded_chunk = chunk.decode('utf-8')
-                        full_response += decoded_chunk
-                        print(decoded_chunk, end='', flush=True)
-                return full_response
-            else:
-                return response.json().get("text", "")
-        except requests.exceptions.RequestException as e:
-            print(f"An error occurred: {e}")
+    except requests.exceptions.ConnectionError:
+        return "Error: Could not connect to Ollama server."
+    except requests.exceptions.RequestException as e:
+        return f"Error during API request: {e}"
 
-#Test prompt
 if __name__ == "__main__":
-        user_prompt = "Name 3 counties in Europe."
-        print(f"Sending prompt to Llama 3: '{user_prompt}'\n")
+    user_prompt = "Name 5 countries"
+
+    print(f"Sending prompt to Llama 3: '{user_prompt}'")
+
+    # Stream the response in chunks
+    print("\nStreaming Response")
+    response_streamed = generate_llama3_response(user_prompt, stream=True) 
+    print("\n(Stream complete)")
