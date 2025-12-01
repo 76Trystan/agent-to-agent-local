@@ -6,7 +6,7 @@ def get_weather_forecast(city=None, latitude=None, longitude=None):
     Get 7-day weather forecast.
     
     Args:
-        city: City name (e.g., "Sydney")
+        city: City name
         latitude: Latitude coordinate
         longitude: Longitude coordinate
     
