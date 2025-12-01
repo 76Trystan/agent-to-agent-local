@@ -1,4 +1,3 @@
-from tools import get_current_weather, get_weather_forecast
 
 # Scholar Agent Prompt
 SCHOLAR_SYSTEM_PROMPT = """You are Scholar, a thorough research assistant.

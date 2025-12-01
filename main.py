@@ -1,6 +1,5 @@
 from prompts_example import SCHOLAR_SYSTEM_PROMPT, FACT_CHECK_PROMPT, MAX_ITERATIONS
 from client import query_llama
-from weather_client import get_weather_forecast, format_weather_for_llm
 import sys
 
 def main():
@@ -25,12 +24,6 @@ def main():
     print("Processing...")
     print("-" * 100 + "\n")
 
-    # Check if question is weather-related
-    # change this later out for a context detection model =================
-    weather_keywords = ['weather', 'temperature', 'rain', 'forecast', 'sunny', 'cloudy', 'wind', 'storm']
-    is_weather_query = any(keyword in user_message.lower() for keyword in weather_keywords)
-    # =====================================================================
-
     # First step -> Scholar Agent researches the question
     print("Scholar Agent is researching your question...\n")
     scholar_response = query_llama(SCHOLAR_SYSTEM_PROMPT, user_message, temperature=0.3)
@@ -41,6 +34,7 @@ def main():
     
     print(f"Scholar Agent's Answer:\n{scholar_response}\n")
     print("-" * 100 + "\n")
+
 
     # Step 2: Fact Checker validates Scholar's answer
     print("Fact Checker Agent is now validating Scholar's answer...\n")
