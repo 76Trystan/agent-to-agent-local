@@ -1,56 +1,60 @@
 import requests
 import json
 
-# Define the Ollama API endpoint for generating responses
+# Ollama API endpoint (runs locally)
+OLLAMA_URL = "http://localhost:11434/api/generate"
+MODEL_NAME = "llama3:8b"
 
-OLLAMA_API_URL = "http://localhost:11434/api/generate" #Ollama's default local server URL
-MODEL_NAME = "llama3:8b"  # change model if needed (not using llama3:70b as it will crash my computer)
 
-def query_llama(system_prompt, user_message, temperature=0.35):
-
-    prompt = f"{system_prompt}\n\nUser: {user_message}\n\nAssistant:"
-
+def query_llama(system_prompt, user_message, temperature=0.4):
+      
+    # Combines system prompt and user message
+    full_prompt = f"{system_prompt}\n\nUser: {user_message}\n\nAssistant:"
+    
+    # Prepare request payload
     payload = {
         "model": MODEL_NAME,
-        "prompt": user_message,
-        "stream": True,
+        "prompt": full_prompt,
+        "stream": False, 
         "options": {
             "temperature": temperature,
-            "num_predict": 2000
+            "num_predict": 2000  # Max tokens to generate
         }
     }
-
+    
     try:
-        # Sending request to Ollama API
-        response = requests.post(OLLAMA_API_URL, json=payload, timeout=120, stream=True)
+        # Send request to Ollama
+        response = requests.post(OLLAMA_URL, json=payload, timeout=120)
+        
+        # Check if request was successful
         response.raise_for_status()
+        
+        # Get the raw response text for debugging
+        raw_response = response.text  
 
-        # Parse response
-        result = response.json()
-        return result["response"].strip()
-    
-    except requests.exceptions.Timeout:
+        # Parse JSON response
+        try:
+            result = response.json()
+        except json.JSONDecodeError as e:
+            return f"ERROR: Invalid JSON response from Ollama. Check debug output above."
+        
+        # grabbing the generated text
+        if "response" in result:
+            generated_text = result["response"].strip() # strips whitespace
+            return generated_text
+        else:
+            return f"ERROR: 'response' key not found in Ollama output. Keys: {list(result.keys())}"
+        
+    #Error handling
+    except requests.exceptions.Timeout: # error handling for timeout
         return "ERROR: Request timed out. Llama took too long to respond."
-    except requests.exceptions.ConnectionError:
-        return "ERROR: Cannot connect to Ollama. Is it running? (ollama serve)"
     
-    except Exception as e:
-        return f"ERROR: {str(e)}"
-
-
-
-
-'''
-if __name__ == "__main__":
-    import argparse
-    parser = argparse.ArgumentParser(description="Query Llama 3 via Ollama")
-    parser.add_argument("-p", "--prompt", help="Prompt text", default=None)
-    args = parser.parse_args()
+    except requests.exceptions.ConnectionError: # error handling for connection issues
+        return "ERROR: Cannot connect to Ollama. Is it running? Try: ollama serve"
     
-    user_prompt = args.prompt or input("Enter your prompt: ")
-    print(f"Sending prompt to Llama 3: '{user_prompt}'")
+    except requests.exceptions.HTTPError as e: # error handling for HTTP errors
+        return f"ERROR: HTTP error from Ollama: {e}"
     
-    response = query_llama("", user_prompt)
-    print("\nResponse:")
-    print(response)
-    '''
+    except Exception as e: # general error handling
+        return f"ERROR: Unexpected error: {type(e).__name__}: {str(e)}"
+
