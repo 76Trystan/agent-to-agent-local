@@ -41,5 +41,7 @@ def generate_llama3_response(prompt, model_name="llama3", stream=False):
         except requests.exceptions.RequestException as e:
             print(f"An error occurred: {e}")
 
-            
-
+#Test prompt
+if __name__ == "__main__":
+        user_prompt = "Name 3 counties in Europe."
+        print(f"Sending prompt to Llama 3: '{user_prompt}'\n")
