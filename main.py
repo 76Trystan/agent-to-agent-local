@@ -1,5 +1,6 @@
 from prompts_example import SCHOLAR_SYSTEM_PROMPT, FACT_CHECK_PROMPT, MAX_ITERATIONS
 from client import query_llama
+#from tools import get_tool_functon
 import sys
 
 def main():
