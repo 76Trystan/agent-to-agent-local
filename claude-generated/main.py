@@ -4,7 +4,7 @@ Demonstrates agent handoffs and tool use.
 """
 
 from agents import Agent, Swarm, Response
-from client import query_llama
+from archived.client import query_llama
 import sys
 
 

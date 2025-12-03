@@ -1,5 +1,5 @@
-from agent import Agents
-from client import query_llama
+from archived.agent import Agents
+from archived.client import query_llama
 from tools import TOOLS
 import sys
 
