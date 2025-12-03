@@ -1,17 +1,6 @@
 # Agent-to-Agent (A2A) Communication System
 
-A flexible multi-agent system built with Python and Ollama LLaMA models that enables autonomous agents to collaborate on complex tasks through sequential and parallel workflows.
-
----
-
-## Table of Contents
-
-- [Agent-to-Agent (A2A) Communication System](#agent-to-agent-a2a-communication-system)
-  - [Table of Contents](#table-of-contents)
-  - [Overview](#overview)
-  - [Features](#features)
-  - [Installation](#installation)
-    - [Requirements](#requirements)
+A flexible multi-agent system using the openAI agent SDK, built with Python and Ollama LLaMA models that enables autonomous agents to collaborate on complex tasks through sequential and parallel workflows.
 
 ---
 
