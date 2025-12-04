@@ -9,7 +9,7 @@ current_model = "llama3.1:8b"
 
 def create_handoff_callback(agent_name):
     def callback(context: RunContextWrapper[None]):
-        print(f"Handoff called! Context: {agent_name}")
+        print(f"Handoff called. Agent Used: {agent_name}")
     return callback
 
 #---------------------------- specialist agents ----------------------------
@@ -38,22 +38,13 @@ weather_agent = Agent(
     name="Weather Expert",
     handoff_description="Specialist in collecdting weather information and presenting it to users",
     instructions="You provide accurate and up-to-date weather information for any city requested by the user. Use the available tools to fetch the latest weather data and present it clearly.",
-    TOOLS= [TOOLS["weather"]],
     model=OpenAIChatCompletionsModel(
         model=current_model,
         openai_client=client.ollama_client,
     ),
 )
 
-file_retreiver = Agent(
-    name="File Retreiver",
-    handoff_description="Access files and retrieve information based on user queries",
-    instructions="You provide accurate and up-to-date weather information for any city requested by the user. Use the available tools to fetch the latest weather data and present it clearly.",
-    model=OpenAIChatCompletionsModel(
-        model=current_model,
-        openai_client=client.ollama_client,
-    ),
-)
+
 
 #---------------------------- triage agent ----------------------------
 
