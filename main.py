@@ -1,10 +1,10 @@
 import asyncio
 import openai_agent
-from agents import Agent, Runner, RunContextWrapper
+from agents import Runner
 from agents.extensions.handoff_prompt import RECOMMENDED_PROMPT_PREFIX
 
 async def main():
-    result = await Runner.run(openai_agent.triage_agent, "solve the quadratic equation 2x^2 + 5x -3 = 0")
+    result = await Runner.run(openai_agent.triage_agent, "whats the quadratic solution for 2x^2 + 5x -3?")
     print(result.final_output)
 
 

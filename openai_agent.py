@@ -1,5 +1,5 @@
 import client
-from agents import Agent, OpenAIChatCompletionsModel, RunContextWrapper, Handoff, function_tool, ModelSettings
+from agents import Agent, OpenAIChatCompletionsModel, RunContextWrapper, handoff
 from agents.extensions.handoff_prompt import RECOMMENDED_PROMPT_PREFIX
 
 #change based on current model available in ollama
@@ -7,8 +7,10 @@ current_model = "llama3.1:8b"
 
 #---------------------------- handoff call ----------------------------
 
-def on_handoff(_: RunContextWrapper[None]):
-    print("Handoff called: ", Agent.name)
+def create_handoff_callback(agent_name):
+    def callback(context: RunContextWrapper[None]):
+        print(f"Handoff called! Context: {agent_name}")
+    return callback
 
 #---------------------------- specialist agents ----------------------------
 
@@ -32,12 +34,36 @@ poet_agent = Agent(
     ),
 )
 
+weather_agent = Agent(
+    name="Weather Expert",
+    handoff_description="Specialist in collecdting weather information and presenting it to users",
+    instructions="You provide accurate and up-to-date weather information for any city requested by the user. Use the available tools to fetch the latest weather data and present it clearly.",
+    model=OpenAIChatCompletionsModel(
+        model=current_model,
+        openai_client=client.ollama_client,
+    ),
+)
+
+file_retreiver = Agent(
+    name="File Retreiver",
+    handoff_description="Access files and retrieve information based on user queries",
+    instructions="You provide accurate and up-to-date weather information for any city requested by the user. Use the available tools to fetch the latest weather data and present it clearly.",
+    model=OpenAIChatCompletionsModel(
+        model=current_model,
+        openai_client=client.ollama_client,
+    ),
+)
+
 #---------------------------- triage agent ----------------------------
 
 triage_agent = Agent(
     name="Triage Agent",
     instructions=f"""{RECOMMENDED_PROMPT_PREFIX}"You determine which agent to use based on the user's prompt. and provide which choice you made.""",
-    handoffs=[math_agent, poet_agent],
+    handoffs=[
+    handoff(math_agent, on_handoff=create_handoff_callback("Math Tutor")),
+    handoff(poet_agent, on_handoff=create_handoff_callback("Poet")),
+    handoff(weather_agent, on_handoff=create_handoff_callback("Weather Expert")),
+    ],
     model=OpenAIChatCompletionsModel(
         model=current_model,
         openai_client=client.ollama_client,
