@@ -1,5 +1,4 @@
 import math
-import re
 
 
 # ---------------------------- Functions ----------------------------
@@ -96,6 +95,13 @@ TOOLS = {
         "example": "quadratic(2, 5, -3)"
     },
 
+
+
     # Weather tool
+    "weather": {
+        "function": get_weather,
+        "description": "Retrieve the current weather for a specified city based on the data fetched from the weather API.",
+        "example": "whats the weather in Sydney like in the next few days?"
+    },
 
 }
