@@ -2,4 +2,7 @@
 .env
 
 # Claudes Examples
-claude-generated/
+archived/
+
+# Python cache files
+__pycache__/
