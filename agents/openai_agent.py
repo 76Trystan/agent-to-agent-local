@@ -82,6 +82,9 @@ triage_agent = Agent(
     )
 )
 
+
+# health checks
+
 def check_mcp_connection() -> bool:
     """Check if MCP server is accessible"""
     try:

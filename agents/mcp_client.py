@@ -6,7 +6,7 @@ from typing import Dict, Any
 
 class MCPClient:
     
-    def __init__(self, base_url: str = "http://localhost:8000"):
+    def __init__(self, base_url: str = "http://localhost:8001/mcp"):
         self.base_url = base_url
         self.message_id = 0
         self.session = requests.Session()
@@ -29,7 +29,7 @@ class MCPClient:
         
         try:
             response = self.session.post(
-                f"{self.base_url}/message",
+                f"{self.base_url}/mcp",
                 json=payload,
                 headers={"Content-Type": "application/json"},
                 timeout=10
