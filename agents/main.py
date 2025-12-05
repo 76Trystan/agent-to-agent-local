@@ -4,7 +4,7 @@ from agents import Runner
 from agents.extensions.handoff_prompt import RECOMMENDED_PROMPT_PREFIX
 
 async def main():
-    result = await Runner.run(openai_agent.triage_agent, "write a poem about a blue table",)
+    result = await Runner.run(openai_agent.triage_agent, "whats 15 times 4?",)
     print(result.final_output)
 
 
