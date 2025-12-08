@@ -1,10 +1,10 @@
 import client
-from agents import Agent, OpenAIChatCompletionsModel, RunContextWrapper, function_tool, handoff
+from agents import Agent, OpenAIChatCompletionsModel, RunContextWrapper, Runner, HostedMCPTool, function_tool, handoff
 from agents.extensions.handoff_prompt import RECOMMENDED_PROMPT_PREFIX
-import mcp_client
 
 #change based on current model available in ollama
 current_model = "llama3.1:8b"
+
 
 #---------------------------- handoff call ----------------------------
 
@@ -19,7 +19,17 @@ def create_handoff_callback(agent_name):
 math_agent = Agent(
     name="Math Tutor",
     handoff_description="Specialist agent for math questions",
-    instructions="You provide help with math problems, Explain your reasoning at each step and include examples.",
+    instructions="You provide help with math problems, using the tools provided, solve the mathematics question",
+    tools=[
+            HostedMCPTool(
+                tool_config={
+                    "type": "mcp",
+                    "server_label": "Server 1",
+                    "server_url": "http://0.0.0.0:8000/mcp",
+                    "require_approval": "never",
+                }
+            )
+        ],
     model=OpenAIChatCompletionsModel(
         model=current_model,
         openai_client=client.ollama_client,

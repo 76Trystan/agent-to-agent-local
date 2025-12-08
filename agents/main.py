@@ -1,10 +1,11 @@
 import asyncio
-import openai_agent
+#import openai_agent
+import claude_agent
 from agents import Runner
 from agents.extensions.handoff_prompt import RECOMMENDED_PROMPT_PREFIX
 
 async def main():
-    result = await Runner.run(openai_agent.triage_agent, "whats 15 plus 4?",)
+    result = await Runner.run(claude_agent.triage_agent, "whats 15 plus 4?",)
     print(result.final_output)
 
 

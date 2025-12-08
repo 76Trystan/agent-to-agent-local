@@ -23,7 +23,7 @@ async def main():
 
         
         # Execute operations
-        result = await client.call_tool("add_numbers", {"a": 5, "b": 4})
-        print(result.data)
+        #result = await client.call_tool("add_numbers", {"a": 5, "b": 4})
+        #print(result.data)
 
 asyncio.run(main())
