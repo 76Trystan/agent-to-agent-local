@@ -13,25 +13,6 @@ def create_handoff_callback(agent_name):
         print(f"Handoff called. Agent Used: {agent_name}")
     return callback
 
-#---------------------------- MCP Tool Wrapper ----------------------------
-
-#Define call functions from MCP client
-mcp = mcp_client.mcp
-
-@function_tool
-def mcp_add(a: int, b: int) -> str:
-    """Add two numbers using MCP server"""
-    return mcp.call_tool("add_numbers", {"a": a, "b": b})
-
-@function_tool
-def mcp_multiply(a: int, b: int) -> str:
-    """Multiply two numbers using MCP server"""
-    return mcp.call_tool("multiply_numbers", {"a": a, "b": b})
-
-@function_tool
-def mcp_read_status() -> str:
-    """Check MCP server status"""
-    return mcp.read_resource("data://status")
 
 #---------------------------- specialist agents ----------------------------
 
@@ -39,7 +20,6 @@ math_agent = Agent(
     name="Math Tutor",
     handoff_description="Specialist agent for math questions",
     instructions="You provide help with math problems, Explain your reasoning at each step and include examples.",
-    tools=[mcp_add, mcp_multiply],
     model=OpenAIChatCompletionsModel(
         model=current_model,
         openai_client=client.ollama_client,
@@ -82,23 +62,3 @@ triage_agent = Agent(
     )
 )
 
-
-# health checks
-
-def check_mcp_connection() -> bool:
-    """Check if MCP server is accessible"""
-    try:
-        status = mcp.read_resource("data://status")
-        return "Error" not in status
-    except Exception as e:
-        print(f"Warning: Cannot connect to MCP server: {e}")
-        print("   Make sure to start: python server/mcp_server.py")
-        return False
-
-
-# Check connection on module load
-if __name__ != "__main__":
-    if check_mcp_connection():
-        print("MCP server connected")
-    else:
-        print("MCP server not available (agents will work but tools may fail)")
