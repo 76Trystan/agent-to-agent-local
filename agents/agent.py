@@ -100,14 +100,6 @@ def ask_agent(query: str):
 async def main():
     """Main function to initialize and run the agent system."""
     await setup_mcp()
-    
-    print("\n" + "=" * 70)
-    print("AGENT SYSTEM WITH FASTMCP")
-    print("=" * 70)
-    
-    ask_agent("Add 10 and 32")
-    ask_agent("Multiply 5 by 8")
-    ask_agent("Subtract 20 from 100")
 
 if __name__ == "__main__":
     asyncio.run(main())
