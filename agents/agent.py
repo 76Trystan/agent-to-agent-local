@@ -45,7 +45,7 @@ async def setup_mcp():
                 def tool_func(**kwargs):
                     """Call MCP tool"""
                     try:
-                        print(f"[MCP TOOL USED] {tname} with args {kwargs}")
+                        print(f"MCP Tool used: {tname} with args {kwargs}")
                         # Run async function from sync context
                         loop = asyncio.get_event_loop()
                         result = loop.run_until_complete(
