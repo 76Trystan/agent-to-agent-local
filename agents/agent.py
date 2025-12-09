@@ -18,8 +18,8 @@ mcp_tools = []
 agent = None
 session = None
 
+#initialise MCP Connection
 async def setup_mcp():
-    """Initialize MCP connection and get tools from the FastMCP server."""
     global mcp_tools, agent, session
     
     try:
@@ -28,11 +28,11 @@ async def setup_mcp():
         
         # Get list of tools from the server
         async with httpx.AsyncClient() as client:
-            response = await client.get("http://localhost:8000/tools")
-            tools_data = response.json()
+            response = await client.get("http://127.0.0.1:8000/mcp")
+            tools_data = response.json() 
         
         tools_list = tools_data.get("tools", [])
-        print(f"✓ Connected! Loaded {len(tools_list)} tools from MCP server:")
+        print(f"MCP Connected, Loaded {len(tools_list)} tools from MCP server:")
         
         # Create tool functions dynamically
         for tool_info in tools_list:
@@ -70,35 +70,40 @@ async def setup_mcp():
         agent = create_agent(model, mcp_tools)
         
     except Exception as e:
-        print(f"✗ Error connecting to MCP server: {e}")
-        print("Make sure your FastMCP server is running with: python server.py")
+        print(f"Could connect to MCP Server{e}")
         raise
 
+# tool call function
 async def call_mcp_tool(tool_name: str, args: dict):
-    """Call a tool on the MCP server."""
     async with httpx.AsyncClient() as client:
         response = await client.post(
-            "http://localhost:8000/call",
+            "http://127.0.0.1:8000/call",
             json={"tool": tool_name, "args": args}
         )
         result = response.json()
         return result.get("result", "")
 
+# agent ask query
 def ask_agent(query: str):
-    """Ask the agent a question."""
     if agent is None:
         return "Agent not initialized"
+
     try:
         print(f"\n[QUERY] {query}")
-        result = agent.invoke({"messages": [{"role": "user", "content": query}]})
-        response = result['messages'][-1].content
+
+        result = agent.invoke({
+            "messages": [{"role": "user", "content": query}]
+        })
+
+        response = result["messages"][-1].content
+
         print(f"[RESPONSE] {response}\n")
         return response
+
     except Exception as e:
-        return f"Error: {str(e)}"
+        return f"Error: {e}"
 
 async def main():
-    """Main function to initialize and run the agent system."""
     await setup_mcp()
 
 if __name__ == "__main__":
