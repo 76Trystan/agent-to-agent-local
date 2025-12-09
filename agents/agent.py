@@ -70,7 +70,7 @@ async def setup_mcp():
         agent = create_agent(model, mcp_tools)
         
     except Exception as e:
-        print(f"Could connect to MCP Server{e}")
+        print(f"Could notconnect to MCP Server{e}")
         raise
 
 # tool call function
@@ -89,7 +89,7 @@ def ask_agent(query: str):
         return "Agent not initialized"
 
     try:
-        print(f"\n[QUERY] {query}")
+        print(f"\nUser Prompt: {query}")
 
         result = agent.invoke({
             "messages": [{"role": "user", "content": query}]
@@ -97,14 +97,19 @@ def ask_agent(query: str):
 
         response = result["messages"][-1].content
 
-        print(f"[RESPONSE] {response}\n")
+        print(f"Response: {response}\n")
         return response
 
     except Exception as e:
         return f"Error: {e}"
 
-async def main():
+# entry point with prompt
+async def main(prompt: str = None):
     await setup_mcp()
+    if prompt:
+        return ask_agent(prompt)
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    user_prompt = "whats 8 plus 5"  
+    response = asyncio.run(main(user_prompt))
+    print("Final response:", response)
