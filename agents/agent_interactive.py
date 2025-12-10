@@ -14,7 +14,6 @@ model = ChatOllama(
 )
 
 async def run_agent(agent, query, tools_dict):
-    #Runs agent with query
     messages = [HumanMessage(content=query)]
     
     while True:
@@ -78,26 +77,26 @@ async def main():
     
     # Create the agent
     agent = create_agent(model, mcp_tools)
+
+    print("\n")
+    print("Running Math Agent...")
+    #print("-"*100 + "\n")
     
-    # example queries
-    queries = [
-        "What is 25 + 17?"
-    ]
+    # Interactive mode (optional)
+    print("\n" + "-"*50)
+    print("Interactive Mode (type 'quit' to exit)")
+    print("-"*50 + "\n")
     
-    print("\n" + "-"*100)
-    print("Running Math Agent")
-    print("-"*100 + "\n")
-    
-    for query in queries:
-        print(f"Question: {query}")
+    while True:
+        user_input = input("Enter a math question: ").strip()
+        if user_input.lower() == 'quit':
+            break
+        
         try:
-            result = await run_agent(agent, query, tools_dict)
+            result = await run_agent(agent, user_input, tools_dict)
             print(f"Final Result: {result}\n")
         except Exception as e:
             print(f"Error: {e}\n")
-    print("-"*100)        
-    print("End")
-    print("-"*100)
 
 
 if __name__ == "__main__":

@@ -24,8 +24,6 @@ def divide(a: float, b: float) -> float:
         return 0 # returns zero if cannot calculate
     return a / b
 
-
-
 if __name__ == "__main__":
     print("Starting FastMCP Server...")
     mcp.run(transport="streamable-http")
